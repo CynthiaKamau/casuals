@@ -1,9 +1,9 @@
 const sequelize = require("../dbconfig");
-const Sequelize = require('sequelize');
+const Sequelize = require("sequelize");
 const Joi = require("joi");
 
-const Profile = sequelize.sequelize.define(
-    'profiles',
+const Jobs = sequelize.sequelize.define(
+    'jobs',
     {
         id: {
             autoIncrement: true,
@@ -11,37 +11,54 @@ const Profile = sequelize.sequelize.define(
             allowNull: false,
             primaryKey: true
         },
-        username: {
+        title: {
+            type: Sequelize.STRING(191),
+            allowNull: false
+        },
+        description: {
+            type: Sequelize.STRING(191),
+            allowNull: false
+        },
+        location: {
+            type: Sequelize.STRING(191),
+            allowNull: false
+        },
+        preferance: {
             type: Sequelize.STRING(191),
             allowNull: true
         },
-        gender: {
-            type: Sequelize.ENUM('MALE', 'FEMALE', 'TRANS-GENDER', 'OTHER'),
-            allowNull: true
-        },
-        dob: {
+        date_added: {
             type: Sequelize.DATEONLY,
-            allowNull: true
+            allowNull: false
         },
-        citizenship: {
-            type: Sequelize.STRING(191),
-            allowNull: true
+        validity: {
+            type: Sequelize.DATEONLY,
+            allowNull: false
         },
-        address: {
-            type: Sequelize.STRING(191),
-            allowNull: true
+        client_id: {
+            type: Sequelize.BIGINT.UNSIGNED,
+            allowNull: false,
+            references: {
+                model: 'users',
+                key: 'id'
+            }
         },
-        profile_photo: {
-            type: Sequelize.STRING(191),
-            allowNull: true
-        },
-        user_id: {
+        worker_id: {
             type: Sequelize.BIGINT.UNSIGNED,
             allowNull: true,
             references: {
                 model: 'users',
                 key: 'id'
             }
+        },
+        status: {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: 1
+        },
+        ratings: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
         },
         created_by: {
             type: Sequelize.INTEGER.UNSIGNED,
@@ -66,7 +83,7 @@ const Profile = sequelize.sequelize.define(
     },
     {
         sequelize,
-        tableName: 'profiles',
+        tableName: 'jobs',
         timestamps: true,
         underscored: true,
         indexes: [
@@ -79,64 +96,47 @@ const Profile = sequelize.sequelize.define(
                 ]
             },
             {
-                name: "profiles_user_id_foreign",
+                name: "jobs_client_id_foreign",
                 using: "BTREE",
                 fields: [
                     {name: "user_id"},
                 ]
             },
             {
-                name: "profiles_facility_id_foreign",
+                name: "jobs_worker_id_foreign",
                 using: "BTREE",
                 fields: [
-                    {name: "facility_id"},
+                    {name: "user_id"},
                 ]
-            },
-            {
-                name: "profiles_cadre_id_foreign",
-                using: "BTREE",
-                fields: [
-                    {name: "cadre_id"},
-                ]
-            },
-            {
-                name: "profiles_department_id_foreign",
-                using: "BTREE",
-                fields: [
-                    {name: "department_id"},
-                ]
-            },
-            {
-                name: "profiles_licence_id_foreign",
-                using: "BTREE",
-                fields: [
-                    {name: "licence_id"},
-                ]
-            },
+            }
         ]
     }
 );
 
-function validateProfile(profile) {
+function validateJob(job) {
     const schema = Joi.object({
-        username: Joi.string()
+        title: Joi.string()
             .min(3)
             .max(191)
             .required(),
-        gender: Joi.string()
+        description: Joi.string()
+            .min(3)
+            .max(250)
             .required(),
-        dob: Joi.date()
+        location: Joi.string()
             .required(),
-        citizenship: Joi.string()
+        date_added: Joi.date()
             .required(),
-        address: Joi.string()
+        validity: Joi.date()
             .required(),
-        user_id: Joi.number()
+        client_id: Joi.number()
+            .required(),
+        worker_id: Joi.number()
             .required()
     });
 
-    return schema.validate(profile);
+    return schema.validate(job);
 }
 
-exports.Profile = Profile;
-exports.validateProfile = validateProfile;
+exports.Jobs = Jobs;
+exports.validateJob = validateJob;

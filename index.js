@@ -15,9 +15,9 @@ app.use(bodyParser.json());
 //Import Routes
 const authRoute = require('./routes/auth');
 const usersRoute = require('./routes/serviceProviders');
-
+const jobsRoute = require('./routes/jobs');
 //Route Middlewares
 app.use('/api/user', authRoute);
-app.use('/api/', usersRoute);
+app.use('/api/', usersRoute, jobsRoute);
 
 app.listen(PORT, () => console.log('Server up and running'));

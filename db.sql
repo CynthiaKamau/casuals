@@ -66,6 +66,7 @@ CREATE TABLE "public"."profiles" (
   "dob" date NOT NULL,
   "user_id" int8 NOT NULL,
   "profile_photo" varchar(255) COLLATE "pg_catalog"."default",
+  "status" bool NOT NULL DEFAULT true,
   "created_at" timestamp(0),
   "updated_at" timestamp(0),
   "deleted_at" timestamp(0),
@@ -86,4 +87,40 @@ CREATE TABLE "public"."profiles" (
 ;
 
 ALTER TABLE "public"."profiles" 
+  OWNER TO "postgres";
+
+
+CREATE SEQUENCE jobs_id_seq;
+CREATE TABLE "public"."jobs" (
+  "id" int8 NOT NULL DEFAULT nextval('jobs_id_seq'::regclass),
+  "title" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "description" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "date_added" date NOT NULL,
+  "validity" date NOT NULL,
+  "client_id" int8 NOT NULL,
+  "worker_id" int8 NOT NULL,
+  "preferance" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "ratings" int8 NOT NULL,
+  "status" bool NOT NULL DEFAULT true,
+  "location" varchar(255) COLLATE "pg_catalog"."default",
+  "created_at" timestamp(0),
+  "updated_at" timestamp(0),
+  "deleted_at" timestamp(0),
+  "created_by" int8,
+  "updated_by" int8,
+  "deleted_by" int8,
+  "restored_by" int8,
+  "restored_at" timestamp(0),
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("client_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("worker_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("created_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("updated_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("deleted_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("restored_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+)
+;
+
+
+ALTER TABLE "public"."jobs" 
   OWNER TO "postgres";

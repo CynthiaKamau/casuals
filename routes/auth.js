@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const {User, loginValidation, registrationValidation} = require('../models/User');
+const { Profile} = require('../models/Profile');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
@@ -59,8 +60,22 @@ router.post('/login', async (req,res) => {
 });
 
 router.post('/profile', async (req, res) => {
-    
 
+    await Profile.create({
+        username: req.body.username,
+        gender: req.body.gender,
+        date_added: req.body.date_added,
+        dob: req.body.dob,
+        user_id: req.body.user_id,
+        profile_photo: req.body.profile_photo,
+        ratings: req.body.ratings,
+        address: req.body.address,
+        citizenship: req.body.citizenship,
+        status: req.body.status
+    }).then( response => res.status(201).json({
+        message: "Profile updated successfully",
+        success: true })
+    ).catch( error => res.status(500).json(error.error[0].message ));
 });
 
 module.exports = router;
