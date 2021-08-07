@@ -58,20 +58,20 @@ CREATE TABLE "public"."users" (
 ALTER TABLE "public"."users" 
   OWNER TO "postgres";
 
-CREATE SEQUENCE profiles_id_seq;
-CREATE TABLE "public"."profiles" (
-  "id" int8 NOT NULL DEFAULT nextval('profiles_id_seq'::regclass),
+CREATE SEQUENCE client_profiles_id_seq;
+CREATE TABLE "public"."client_profiles" (
+  "id" int8 NOT NULL DEFAULT nextval('client_profiles_id_seq'::regclass),
   "username" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "gender" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "dob" date NOT NULL,
+  "gender" varchar(255) COLLATE "pg_catalog"."default",
+  "dob" date,
   "user_id" int8 NOT NULL,
-  "profile_photo" varchar(255) COLLATE "pg_catalog"."default",
   "status" bool NOT NULL DEFAULT true,
+  "address" varchar(255) COLLATE "pg_catalog"."default",
+  "citizenship" varchar(255) COLLATE "pg_catalog"."default",
   "created_at" timestamp(0),
   "updated_at" timestamp(0),
   "deleted_at" timestamp(0),
-  "address" varchar(255) COLLATE "pg_catalog"."default",
-  "citizenship" varchar(255) COLLATE "pg_catalog"."default",
+  "restored_at" timestamp(0),
   "created_by" int8,
   "updated_by" int8,
   "deleted_by" int8,
@@ -86,7 +86,41 @@ CREATE TABLE "public"."profiles" (
 )
 ;
 
-ALTER TABLE "public"."profiles" 
+ALTER TABLE "public"."client_profiles" 
+  OWNER TO "postgres";
+
+CREATE SEQUENCE worker_profiles_id_seq;
+CREATE TABLE "public"."worker_profiles" (
+  "id" int8 NOT NULL DEFAULT nextval('worker_profiles_id_seq'::regclass),
+  "username" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "gender" varchar(255) COLLATE "pg_catalog"."default",
+  "dob" date ,
+  "user_id" int8 NOT NULL,
+  "profile_photo" varchar(255) COLLATE "pg_catalog"."default",
+  "status" bool NOT NULL DEFAULT true,
+  "address" varchar(255) COLLATE "pg_catalog"."default",
+  "citizenship" varchar(255) COLLATE "pg_catalog"."default",
+  "skills" varchar(255) COLLATE "pg_catalog"."default",
+  "rate" int8,
+  "created_at" timestamp(0),
+  "updated_at" timestamp(0),
+  "deleted_at" timestamp(0),
+  "restored_at" timestamp(0),
+  "created_by" int8,
+  "updated_by" int8,
+  "deleted_by" int8,
+  "restored_by" int8,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("created_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("updated_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("deleted_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("restored_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CHECK (gender::text = ANY (ARRAY['MALE'::character varying::text, 'FEMALE'::character varying::text, 'TRANS-GENDER'::character varying::text, 'OTHER'::character varying::text]))
+)
+;
+
+ALTER TABLE "public"."worker_profiles" 
   OWNER TO "postgres";
 
 

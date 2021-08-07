@@ -2,8 +2,8 @@ const sequelize = require("../dbconfig");
 const Sequelize = require('sequelize');
 const Joi = require("joi");
 
-const Profile = sequelize.sequelize.define(
-    'profiles',
+const ClientProfile = sequelize.sequelize.define(
+    'client_profiles',
     {
         id: {
             autoIncrement: true,
@@ -13,7 +13,8 @@ const Profile = sequelize.sequelize.define(
         },
         username: {
             type: Sequelize.STRING(191),
-            allowNull: true
+            allowNull: true,
+            unique: "client_profiles_username_unique"
         },
         gender: {
             type: Sequelize.ENUM('MALE', 'FEMALE', 'TRANS-GENDER', 'OTHER'),
@@ -31,13 +32,9 @@ const Profile = sequelize.sequelize.define(
             type: Sequelize.STRING(191),
             allowNull: true
         },
-        profile_photo: {
-            type: Sequelize.STRING(191),
-            allowNull: true
-        },
         user_id: {
             type: Sequelize.BIGINT.UNSIGNED,
-            allowNull: true,
+            allowNull: false,
             references: {
                 model: 'users',
                 key: 'id'
@@ -66,7 +63,7 @@ const Profile = sequelize.sequelize.define(
     },
     {
         sequelize,
-        tableName: 'profiles',
+        tableName: 'client_profiles',
         timestamps: true,
         underscored: true,
         indexes: [
@@ -79,45 +76,26 @@ const Profile = sequelize.sequelize.define(
                 ]
             },
             {
-                name: "profiles_user_id_foreign",
+                name: "client_profiles_user_id_foreign",
                 using: "BTREE",
                 fields: [
                     {name: "user_id"},
                 ]
             },
             {
-                name: "profiles_facility_id_foreign",
+                name: "client_profiles_username_unique",
+                unique: true,
                 using: "BTREE",
                 fields: [
-                    {name: "facility_id"},
+                    {name: "username"},
                 ]
-            },
-            {
-                name: "profiles_cadre_id_foreign",
-                using: "BTREE",
-                fields: [
-                    {name: "cadre_id"},
-                ]
-            },
-            {
-                name: "profiles_department_id_foreign",
-                using: "BTREE",
-                fields: [
-                    {name: "department_id"},
-                ]
-            },
-            {
-                name: "profiles_licence_id_foreign",
-                using: "BTREE",
-                fields: [
-                    {name: "licence_id"},
-                ]
-            },
+
+            }
         ]
     }
 );
 
-function validateProfile(profile) {
+function validateClientProfile(client) {
     const schema = Joi.object({
         username: Joi.string()
             .min(3)
@@ -135,8 +113,8 @@ function validateProfile(profile) {
             .required()
     });
 
-    return schema.validate(profile);
+    return schema.validate(client);
 }
 
-exports.Profile = Profile;
-exports.validateProfile = validateProfile;
+exports.ClientProfile = ClientProfile;
+exports.validateClientProfile = validateClientProfile;

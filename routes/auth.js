@@ -1,12 +1,12 @@
 const router = require('express').Router();
 const {User, loginValidation, registrationValidation} = require('../models/User');
-const { Profile} = require('../models/Profile');
+const { ClientProfile} = require('../models/ClientProfile');
+const { WorkerProfile} = require('../models/WorkerProfile');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 
-
-router.post('/register', async (req,res) => {
+router.post('/register-client', async (req,res) => {
 
     let { error } = registrationValidation(req.body);
 
@@ -27,10 +27,77 @@ router.post('/register', async (req,res) => {
             role_id: req.body.role_id,
             status: req.body.status,
             password: hashpwd
-        }).then( response => res.status(201).json({
-                message: "User Created Successfully",
-                success: true})
-        .catch( error => res.status(500).json(error.errors[0].message)));
+
+        },
+
+        ).then( async (response) => {
+
+            await ClientProfile.create({
+                
+                user_id : response.id,
+                username: req.body.username,
+                status: req.body.status
+            })
+            .then(async () => {
+                // await transaction.commit();
+                res.status(200).json({
+                    message: "You have successfully been registered.",
+                    success: true,
+                });
+            })
+            .catch((err) => {
+                res.status(500).json(err);
+            })
+       
+        }).catch( error => res.status(500).json(error));
+    
+
+});
+
+router.post('/register-worker', async (req,res) => {
+
+    let { error } = registrationValidation(req.body);
+
+    if(error) {
+        return res.status(400).send(error.details[0].message);
+    }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashpwd = await bcrypt.hash(req.body.password, salt);
+
+        await User.create({
+
+            first_name: req.body.first_name,
+            middle_name: req.body.middle_name,
+            last_name: req.body.last_name,
+            email: req.body.email,
+            phone_number: req.body.phone_number,
+            role_id: req.body.role_id,
+            status: req.body.status,
+            password: hashpwd
+
+        },
+
+        ).then( async (response) => {
+
+            await WorkerProfile.create({
+                
+                user_id : response.id,
+                username: req.body.username,
+                status: req.body.status
+            })
+            .then(async () => {
+                // await transaction.commit();
+                res.status(200).json({
+                    message: "You have successfully been registered.",
+                    success: true,
+                });
+            })
+            .catch((err) => {
+                res.status(500).json(err);
+            })
+       
+        }).catch( error => res.status(500).json(error));
     
 
 });
@@ -61,14 +128,15 @@ router.post('/login', async (req,res) => {
 
 router.post('/profile', async (req, res) => {
 
-    await Profile.create({
+    await WorkerProfile.update({
         username: req.body.username,
         gender: req.body.gender,
         date_added: req.body.date_added,
         dob: req.body.dob,
         user_id: req.body.user_id,
         profile_photo: req.body.profile_photo,
-        ratings: req.body.ratings,
+        skills: req.body.skills,
+        rate: req.body.rate,
         address: req.body.address,
         citizenship: req.body.citizenship,
         status: req.body.status
