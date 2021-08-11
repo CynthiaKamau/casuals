@@ -1,0 +1,138 @@
+const router = require('express').Router();
+const verify = require('../middleware/jwt/jwt');
+const {User, registrationValidation} = require('../models/User');
+const { ClientProfile} = require('../models/ClientProfile');
+const bcrypt = require('bcryptjs');
+
+//all clients
+router.get('/clients', verify, async (req,res) => {
+
+    await User.findAndCountAll({
+        where: { role_id : 2},
+        attributes: { exclude: ['password'] }
+    }).then(clients => res.status(200).json({data: clients})
+    ).catch(error => res.status(500).json({error: error}));
+
+});
+
+//get client
+router.get('/client/:id', verify, async (req,res) => {
+
+    await ClientProfile.findOne({
+        where: { user_id : req.params.id},
+        attributes: { exclude: ['password'] }
+    }).then(client => res.status(200).json({data: client}))
+    .catch(error => res.status(500).json({error: error}));
+
+});
+
+//create client
+router.post('/client', async (req,res) => {
+
+    let { error } = registrationValidation(req.body);
+
+    if(error) {
+        return res.status(400).send(error.details[0].message);
+    }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashpwd = await bcrypt.hash(req.body.password, salt);
+
+        await User.create({
+
+            first_name: req.body.first_name,
+            middle_name: req.body.middle_name,
+            last_name: req.body.last_name,
+            email: req.body.email,
+            phone_number: req.body.phone_number,
+            role_id: req.body.role_id,
+            status: req.body.status,
+            password: hashpwd
+
+        },
+
+        ).then( async (response) => {
+
+            await ClientProfile.create({
+                
+                user_id : response.id,
+                username: req.body.username,
+                status: req.body.status
+            })
+            .then(async () => {
+                // await transaction.commit();
+                res.status(200).json({
+                    message: "You have successfully been registered.",
+                    success: true,
+                });
+            })
+            .catch((err) => {
+                res.status(500).json(err);
+            })
+       
+        }).catch( error => res.status(500).json(error));
+    
+
+});
+
+//update client
+router.put('/client/:id', async (req,res) => {
+
+    let client = await User.findByPk(req.params.id);
+
+    if(!client) {
+        return res.status(400).send('User does not exist!');
+    }
+
+    await User.update({
+
+        first_name: req.body.first_name,
+        middle_name: req.body.middle_name,
+        last_name: req.body.last_name,
+        email: req.body.email,
+        phone_number: req.body.phone_number,
+        role_id: req.body.role_id,
+        status: req.body.status,
+        password: hashpwd
+
+    }, { returning : true, where : { id : req.params.id }}
+    ).then( async (response) => {
+
+        let client_profile = await ClientProfile.findOne({ where : { user_id : response.id }});
+
+        if(!client_profile) {
+            return res.status(400).send('User profile does not exist!');
+        }
+
+        await ClientProfile.update({
+            
+            user_id : response.id,
+            username: req.body.username,
+            gender: req.body.gender,
+            dob: request.body.dob,
+            citizenship: request.body.citizenship,
+            address : req.body.address,
+            status: req.body.status
+        }, { returning : true, where : { user_id : response.id }})
+        .then(async () => {
+            // await transaction.commit();
+            res.status(200).json({
+                message: "Your profile has been updated successfully .",
+                success: true,
+            });
+        })
+        .catch((err) => {
+            res.status(500).json(err);
+        })
+    
+    }).catch( error => res.status(500).json(error));
+
+
+});
+
+//delete client
+router.delete('/client/:id', async (req,res) => {
+
+});
+
+module.exports = router;

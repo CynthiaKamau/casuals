@@ -1,11 +1,11 @@
 const router = require('express').Router();
 const {Jobs} = require('../models/Jobs');
-const verify = require('./verifyToken');
+const verify = require('../middleware/jwt/jwt');
 
 router.get('/jobs', verify, async (req,res) => {
 
     await Jobs.findAndCountAll()
-    .then(jobs => res.status(200).json({jobs: jobs}))
+    .then(jobs => res.status(200).json({data: jobs}))
     .catch(error => res.status(500).json({error: error}));
 
 });

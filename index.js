@@ -14,10 +14,14 @@ app.use(bodyParser.json());
 
 //Import Routes
 const authRoute = require('./routes/auth');
-const usersRoute = require('./routes/serviceProviders');
+const clientsRoute = require('./routes/clients');
+const workersRoute = require('./routes/workers');
 const jobsRoute = require('./routes/jobs');
+
 //Route Middlewares
 app.use('/api/user', authRoute);
-app.use('/api/', usersRoute, jobsRoute);
+app.use('/api/', clientsRoute);
+app.use('/api/', workersRoute);
+app.use('/api/', jobsRoute);
 
 app.listen(PORT, () => console.log('Server up and running'));
