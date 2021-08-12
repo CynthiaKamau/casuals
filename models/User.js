@@ -74,6 +74,18 @@ const User = sequelize.sequelize.define(
             type: Sequelize.INTEGER.UNSIGNED,
             allowNull: true
         },
+        created_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        updated_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        deleted_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
         restored_at: {
             type: Sequelize.DATE,
             allowNull: true

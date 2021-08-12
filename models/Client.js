@@ -1,9 +1,10 @@
 const sequelize = require("../dbconfig");
 const Sequelize = require('sequelize');
 const Joi = require("joi");
+const { User} = require('./User');
 
-const ClientProfile = sequelize.sequelize.define(
-    'client_profiles',
+const Client = sequelize.sequelize.define(
+    'clients',
     {
         id: {
             autoIncrement: true,
@@ -14,7 +15,7 @@ const ClientProfile = sequelize.sequelize.define(
         username: {
             type: Sequelize.STRING(191),
             allowNull: true,
-            unique: "client_profiles_username_unique"
+            unique: "clients_username_unique"
         },
         gender: {
             type: Sequelize.ENUM('MALE', 'FEMALE', 'TRANS-GENDER', 'OTHER'),
@@ -56,6 +57,18 @@ const ClientProfile = sequelize.sequelize.define(
             type: Sequelize.INTEGER.UNSIGNED,
             allowNull: true
         },
+        created_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        updated_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        deleted_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
         restored_at: {
             type: Sequelize.DATE,
             allowNull: true
@@ -63,8 +76,9 @@ const ClientProfile = sequelize.sequelize.define(
     },
     {
         sequelize,
-        tableName: 'client_profiles',
+        tableName: 'clients',
         timestamps: true,
+        paranoid: true,
         underscored: true,
         indexes: [
             {
@@ -76,14 +90,14 @@ const ClientProfile = sequelize.sequelize.define(
                 ]
             },
             {
-                name: "client_profiles_user_id_foreign",
+                name: "clients_user_id_foreign",
                 using: "BTREE",
                 fields: [
                     {name: "user_id"},
                 ]
             },
             {
-                name: "client_profiles_username_unique",
+                name: "clients_username_unique",
                 unique: true,
                 using: "BTREE",
                 fields: [
@@ -95,7 +109,7 @@ const ClientProfile = sequelize.sequelize.define(
     }
 );
 
-function validateClientProfile(client) {
+function validateClient(client) {
     const schema = Joi.object({
         username: Joi.string()
             .min(3)
@@ -116,5 +130,7 @@ function validateClientProfile(client) {
     return schema.validate(client);
 }
 
-exports.ClientProfile = ClientProfile;
-exports.validateClientProfile = validateClientProfile;
+Client.belongsTo(User, {foreign_key : 'user_id'});
+
+exports.Client = Client;
+exports.validateClient = validateClient;

@@ -1,15 +1,14 @@
 const router = require('express').Router();
-const verify = require('../middleware/jwt/jwt');
+const { verify } = require('../middleware/jwt/jwt');
 const {User, registrationValidation} = require('../models/User');
-const { ClientProfile} = require('../models/ClientProfile');
+const { Client} = require('../models/Client');
 const bcrypt = require('bcryptjs');
 
 //all clients
 router.get('/clients', verify, async (req,res) => {
 
-    await User.findAndCountAll({
-        where: { role_id : 2},
-        attributes: { exclude: ['password'] }
+    await Client.findAndCountAll({
+        include: { model: User, attributes: { exclude: ['password'] } }
     }).then(clients => res.status(200).json({data: clients})
     ).catch(error => res.status(500).json({error: error}));
 
@@ -18,16 +17,16 @@ router.get('/clients', verify, async (req,res) => {
 //get client
 router.get('/client/:id', verify, async (req,res) => {
 
-    await ClientProfile.findOne({
+    await Client.findOne({
         where: { user_id : req.params.id},
-        attributes: { exclude: ['password'] }
+        include: { model: User, attributes: { exclude: ['password'] } }
     }).then(client => res.status(200).json({data: client}))
     .catch(error => res.status(500).json({error: error}));
 
 });
 
 //create client
-router.post('/client', async (req,res) => {
+router.post('/client', verify, async (req,res) => {
 
     let { error } = registrationValidation(req.body);
 
@@ -53,7 +52,7 @@ router.post('/client', async (req,res) => {
 
         ).then( async (response) => {
 
-            await ClientProfile.create({
+            await Client.create({
                 
                 user_id : response.id,
                 username: req.body.username,
@@ -76,7 +75,7 @@ router.post('/client', async (req,res) => {
 });
 
 //update client
-router.put('/client/:id', async (req,res) => {
+router.put('/client/:id', verify, async (req,res) => {
 
     let client = await User.findByPk(req.params.id);
 
@@ -93,29 +92,27 @@ router.put('/client/:id', async (req,res) => {
         phone_number: req.body.phone_number,
         role_id: req.body.role_id,
         status: req.body.status,
-        password: hashpwd
 
     }, { returning : true, where : { id : req.params.id }}
     ).then( async (response) => {
 
-        let client_profile = await ClientProfile.findOne({ where : { user_id : response.id }});
+        let client_profile = await Client.findOne({ where : { user_id : req.params.id }});
 
         if(!client_profile) {
             return res.status(400).send('User profile does not exist!');
         }
 
-        await ClientProfile.update({
+        await Client.update({
             
-            user_id : response.id,
+            user_id : req.params.id,
             username: req.body.username,
             gender: req.body.gender,
-            dob: request.body.dob,
-            citizenship: request.body.citizenship,
+            dob: req.body.dob,
+            citizenship: req.body.citizenship,
             address : req.body.address,
             status: req.body.status
-        }, { returning : true, where : { user_id : response.id }})
-        .then(async () => {
-            // await transaction.commit();
+        }, { returning : true, where : { user_id : req.params.id }})
+        .then( response => {
             res.status(200).json({
                 message: "Your profile has been updated successfully .",
                 success: true,
@@ -123,15 +120,23 @@ router.put('/client/:id', async (req,res) => {
         })
         .catch((err) => {
             res.status(500).json(err);
-        })
+        });
     
     }).catch( error => res.status(500).json(error));
-
 
 });
 
 //delete client
-router.delete('/client/:id', async (req,res) => {
+router.delete('/client/:id', verify, async (req,res) => {
+
+    let client = await Client.findOne({where : {user_id : req.params.id}});
+
+    if(!client) {
+        return res.status(400).send("The Client does not exist!");
+    }
+
+    client.destroy().then(response => res.status(200).json({ success : true, message : 'Client account deleted successfully'}))
+    .catch(error => res.status(500).json({ success : false, error : error}) )
 
 });
 

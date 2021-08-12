@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const {Jobs} = require('../models/Jobs');
-const verify = require('../middleware/jwt/jwt');
+const { verify } = require('../middleware/jwt/jwt');
 
 router.get('/jobs', verify, async (req,res) => {
 

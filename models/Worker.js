@@ -1,9 +1,10 @@
 const sequelize = require("../dbconfig");
 const Sequelize = require('sequelize');
 const Joi = require("joi");
+const { User } = require('./User');
 
-const WorkerProfile = sequelize.sequelize.define(
-    'worker_profiles',
+const Worker = sequelize.sequelize.define(
+    'workers',
     {
         id: {
             autoIncrement: true,
@@ -14,7 +15,7 @@ const WorkerProfile = sequelize.sequelize.define(
         username: {
             type: Sequelize.STRING(191),
             allowNull: true,
-            unique: "worker_profiles_username_unique"
+            unique: "workers_username_unique"
 
         },
         gender: {
@@ -69,6 +70,18 @@ const WorkerProfile = sequelize.sequelize.define(
             type: Sequelize.INTEGER.UNSIGNED,
             allowNull: true
         },
+        created_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        updated_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        deleted_at: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
         restored_at: {
             type: Sequelize.DATE,
             allowNull: true
@@ -76,8 +89,9 @@ const WorkerProfile = sequelize.sequelize.define(
     },
     {
         sequelize,
-        tableName: 'worker_profiles',
+        tableName: 'workers',
         timestamps: true,
+        paranoid: true,
         underscored: true,
         indexes: [
             {
@@ -89,14 +103,14 @@ const WorkerProfile = sequelize.sequelize.define(
                 ]
             },
             {
-                name: "worker_profiles_user_id_foreign",
+                name: "workers_user_id_foreign",
                 using: "BTREE",
                 fields: [
                     {name: "user_id"},
                 ]
             },
             {
-                name: "worker_profiles_username_unique",
+                name: "workers_username_unique",
                 unique: true,
                 using: "BTREE",
                 fields: [
@@ -108,7 +122,7 @@ const WorkerProfile = sequelize.sequelize.define(
     }
 );
 
-function validateWorkerProfile(WorkerProfile) {
+function validateWorker(Worker) {
     const schema = Joi.object({
         username: Joi.string()
             .min(3)
@@ -126,8 +140,9 @@ function validateWorkerProfile(WorkerProfile) {
             .required()
     });
 
-    return schema.validate(WorkerProfile);
+    return schema.validate(Worker);
 }
 
-exports.WorkerProfile = WorkerProfile;
-exports.validateWorkerProfile = validateWorkerProfile;
+Worker.belongsTo(User, {foreign_key : 'user_id'});
+exports.Worker = Worker;
+exports.validateWorker = validateWorker;

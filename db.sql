@@ -58,9 +58,9 @@ CREATE TABLE "public"."users" (
 ALTER TABLE "public"."users" 
   OWNER TO "postgres";
 
-CREATE SEQUENCE client_profiles_id_seq;
-CREATE TABLE "public"."client_profiles" (
-  "id" int8 NOT NULL DEFAULT nextval('client_profiles_id_seq'::regclass),
+CREATE SEQUENCE clients_id_seq;
+CREATE TABLE "public"."clients" (
+  "id" int8 NOT NULL DEFAULT nextval('clients_id_seq'::regclass),
   "username" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "gender" varchar(255) COLLATE "pg_catalog"."default",
   "dob" date,
@@ -86,12 +86,12 @@ CREATE TABLE "public"."client_profiles" (
 )
 ;
 
-ALTER TABLE "public"."client_profiles" 
+ALTER TABLE "public"."clients" 
   OWNER TO "postgres";
 
-CREATE SEQUENCE worker_profiles_id_seq;
-CREATE TABLE "public"."worker_profiles" (
-  "id" int8 NOT NULL DEFAULT nextval('worker_profiles_id_seq'::regclass),
+CREATE SEQUENCE workers_id_seq;
+CREATE TABLE "public"."workers" (
+  "id" int8 NOT NULL DEFAULT nextval('workers_id_seq'::regclass),
   "username" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "gender" varchar(255) COLLATE "pg_catalog"."default",
   "dob" date ,
@@ -120,7 +120,7 @@ CREATE TABLE "public"."worker_profiles" (
 )
 ;
 
-ALTER TABLE "public"."worker_profiles" 
+ALTER TABLE "public"."workers" 
   OWNER TO "postgres";
 
 

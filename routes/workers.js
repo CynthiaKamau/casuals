@@ -1,16 +1,15 @@
 const router = require('express').Router();
-const verify = require('../middleware/jwt/jwt');
+const { verify } = require('../middleware/jwt/jwt');
 const {User, registrationValidation} = require('../models/User');
-const { WorkerProfile} = require('../models/WorkerProfile');
+const { Worker} = require('../models/Worker');
 const bcrypt = require('bcryptjs');
 const { request } = require('express');
 
 //all workers
 router.get('/workers', verify, async (req,res) => {
 
-    await User.findAndCountAll({
-        where: { role_id : 3},
-        attributes: { exclude: ['password'] }
+    await Worker.findAndCountAll({
+        include: { model: User, attributes: { exclude: ['password'] } }
     }).then(workers => res.status(200).json({data: workers}))
     .catch(error => res.status(500).json({error: error}));
 
@@ -19,16 +18,16 @@ router.get('/workers', verify, async (req,res) => {
 //get worker
 router.get('/worker/:id', verify, async (req,res) => {
 
-    await WorkerProfile.findOne({
+    await Worker.findOne({
         where: { user_id : req.params.id},
-        attributes: { exclude: ['password'] }
+        include: { model: User, attributes: { exclude: ['password'] } }
     }).then(workers => res.status(200).json({data: workers}))
     .catch(error => res.status(500).json({error: error}));
 
 });
 
 //create worker
-router.post('/worker', async (req,res) => {
+router.post('/worker', verify, async (req,res) => {
 
     let { error } = registrationValidation(req.body);
 
@@ -54,7 +53,7 @@ router.post('/worker', async (req,res) => {
 
         ).then( async (response) => {
 
-            await WorkerProfile.create({
+            await Worker.create({
                 
                 user_id : response.id,
                 username: req.body.username,
@@ -77,7 +76,7 @@ router.post('/worker', async (req,res) => {
 });
 
 //update worker
-router.put('/worker/:id', async (req,res) => {
+router.put('/worker/:id', verify, async (req,res) => {
 
     let worker = await User.findByPk(req.params.id);
 
@@ -98,28 +97,27 @@ router.put('/worker/:id', async (req,res) => {
 
     ).then( async (response) => {
 
-        let worker_profile = await WorkerProfile.findOne({ where : { user_id : response.id }});
+        let worker_profile = await Worker.findOne({ where : { user_id : req.params.id }});
 
         if(!worker_profile) {
             return res.status(400).send('User profile does not exist!');
         }
 
-        await WorkerProfile.update({
+        await Worker.update({
             
-            user_id : response.id,
+            user_id : req.params.id,
             username: req.body.username,
             gender: req.body.gender,
-            dob: request.body.dob,
-            citizenship: request.body.citizenship,
+            dob: req.body.dob,
+            citizenship: req.body.citizenship,
             address : req.body.address,
             profile_photo : req.body.profile_photo,
             skills: req.body.skills,
             rate : req.body.rate,
             status: req.body.status
 
-        }, { returning : true, where : { user_id : response.id }})
-        .then(async () => {
-            // await transaction.commit();
+        }, { returning : true, where : { user_id : req.params.id }})
+        .then(response => {
             res.status(200).json({
                 message: "Your profile has been updated successfully.",
                 success: true,
@@ -137,11 +135,14 @@ router.put('/worker/:id', async (req,res) => {
 //delete worker
 router.delete('/worker/:id', async (req,res) => {
 
-    let worker = await User.findByPk(req.params.id);
+    let worker = await Worker.findOne({ where : {user_id : req.params.id}} );
 
     if(!worker) {
-        return res.status(400).send('User does not exist!');
+        return res.status(400).send("The worker does not exist!");
     }
+
+    worker.destroy().then(response => res.status(200).json({ success : true, message : 'Worker account deleted successfully'}))
+    .catch(error => res.status(500).json({ success : false, error : error}) )
 
 });
 
