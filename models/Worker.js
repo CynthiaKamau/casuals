@@ -1,5 +1,5 @@
 const sequelize = require("../dbconfig");
-const Sequelize = require('sequelize');
+const Datatypes = require('sequelize');
 const Joi = require("joi");
 const { User } = require('./User');
 
@@ -8,46 +8,46 @@ const Worker = sequelize.sequelize.define(
     {
         id: {
             autoIncrement: true,
-            type: Sequelize.BIGINT.UNSIGNED,
+            type: Datatypes.BIGINT.UNSIGNED,
             allowNull: false,
             primaryKey: true
         },
         username: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: true,
             unique: "workers_username_unique"
 
         },
         gender: {
-            type: Sequelize.ENUM('MALE', 'FEMALE', 'TRANS-GENDER', 'OTHER'),
+            type: Datatypes.ENUM('MALE', 'FEMALE', 'TRANS-GENDER', 'OTHER'),
             allowNull: true
         },
         dob: {
-            type: Sequelize.DATEONLY,
+            type: Datatypes.DATEONLY,
             allowNull: true
         },
         citizenship: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: true
         },
         address: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: true
         },
         profile_photo: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: true
         },
         skills: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: true
         },
         rate: {
-            type: Sequelize.INTEGER,
+            type: Datatypes.INTEGER,
             allowNull: true
         },
         user_id: {
-            type: Sequelize.BIGINT.UNSIGNED,
+            type: Datatypes.BIGINT.UNSIGNED,
             allowNull: true,
             references: {
                 model: 'users',
@@ -55,40 +55,40 @@ const Worker = sequelize.sequelize.define(
             }
         },
         created_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         updated_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         deleted_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         restored_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         created_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         updated_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         deleted_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         restored_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         }
     },
     {
-        sequelize,
+        Datatypes,
         tableName: 'workers',
         timestamps: true,
         paranoid: true,

@@ -1,42 +1,43 @@
 const sequelize = require("../dbconfig");
-const Sequelize = require("sequelize");
+const Datatypes= require("sequelize");
 const Joi = require("joi");
+const { Rating } = require("./Rating");
 
 const Job = sequelize.sequelize.define(
     'jobs',
     {
         id: {
             autoIncrement: true,
-            type: Sequelize.BIGINT.UNSIGNED,
+            type: Datatypes.BIGINT.UNSIGNED,
             allowNull: false,
             primaryKey: true
         },
         title: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: false
         },
         description: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: false
         },
         location: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: false
         },
         preferance: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: true
         },
         date_added: {
-            type: Sequelize.DATEONLY,
+            type: Datatypes.DATEONLY,
             allowNull: false
         },
         validity: {
-            type: Sequelize.DATEONLY,
+            type: Datatypes.DATEONLY,
             allowNull: false
         },
         client_id: {
-            type: Sequelize.BIGINT.UNSIGNED,
+            type: Datatypes.BIGINT.UNSIGNED,
             allowNull: false,
             references: {
                 model: 'users',
@@ -44,7 +45,7 @@ const Job = sequelize.sequelize.define(
             }
         },
         worker_id: {
-            type: Sequelize.BIGINT.UNSIGNED,
+            type: Datatypes.BIGINT.UNSIGNED,
             allowNull: true,
             references: {
                 model: 'users',
@@ -52,28 +53,28 @@ const Job = sequelize.sequelize.define(
             }
         },
         status: {
-            type: Sequelize.BOOLEAN,
+            type: Datatypes.BOOLEAN,
             allowNull: false,
             defaultValue: 1
         },
         created_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         updated_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         deleted_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         restored_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         restored_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         }
     },
@@ -132,6 +133,8 @@ function validateJob(job) {
 
     return schema.validate(job);
 }
+
+Job.hasOne(Rating, { foreign_key : 'job_id'});
 
 exports.Job = Job;
 exports.validateJob = validateJob;

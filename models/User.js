@@ -1,40 +1,41 @@
 const sequelize = require("../dbconfig");
-const Sequelize = require('sequelize');
+const Datatypes = require('sequelize');
 const Joi = require("joi");
+const { Rating } = require("./Rating");
 
 const User = sequelize.sequelize.define(
     'users',
     {
         id: {
             autoIncrement: true,
-            type: Sequelize.BIGINT.UNSIGNED,
+            type: Datatypes.BIGINT.UNSIGNED,
             allowNull: false,
             primaryKey: true
         },
         first_name: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: false
         },
         middle_name: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: true
         },
         last_name: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: false
         },
         email: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: false,
             unique: "users_email_unique"
         },
         phone_number: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: false,
             unique: "users_phonenumber_unique"
         },
         role_id: {
-            type: Sequelize.BIGINT.UNSIGNED,
+            type: Datatypes.BIGINT.UNSIGNED,
             allowNull: false,
             references: {
                 model: 'roles',
@@ -42,57 +43,57 @@ const User = sequelize.sequelize.define(
             }
         },
         status: {
-            type: Sequelize.BOOLEAN,
+            type: Datatypes.BOOLEAN,
             allowNull: false,
             defaultValue: 1
         },
         email_verified_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         password: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: true
         },
         remember_token: {
-            type: Sequelize.STRING(100),
+            type: Datatypes.STRING(100),
             allowNull: true
         },
         created_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         updated_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         deleted_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         restored_by: {
-            type: Sequelize.INTEGER.UNSIGNED,
+            type: Datatypes.INTEGER.UNSIGNED,
             allowNull: true
         },
         created_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         updated_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         deleted_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         restored_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         }
     },
     {
-        sequelize,
+        Datatypes,
         tableName: 'users',
         timestamps: true,
         underscored: true,
@@ -179,6 +180,8 @@ function loginValidation(user) {
 
     return schema.validate(user);
 }
+
+User.hasMany(Rating, {foreignKey : 'user_id' }); 
 
 exports.User = User;
 exports.registrationValidation = registrationValidation

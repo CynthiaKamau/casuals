@@ -1,34 +1,34 @@
-const sequelize = require("../db_config");
-const Sequelize = require('sequelize');
+const sequelize = require("../dbconfig");
+const Datatypes = require('sequelize');
 
 const Roles = sequelize.sequelize.define(
     'roles',
     {
         id: {
             autoIncrement: true,
-            type: Sequelize.BIGINT.UNSIGNED,
+            type: Datatypes.BIGINT.UNSIGNED,
             allowNull: false,
             primaryKey: true
         },
         name: {
-            type: Sequelize.STRING(191),
+            type: Datatypes.STRING(191),
             allowNull: false
         },
         status: {
-            type: Sequelize.BOOLEAN,
+            type: Datatypes.BOOLEAN,
             allowNull: false,
             defaultValue: 1
         },
         created_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         updated_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         },
         deleted_at: {
-            type: Sequelize.DATE,
+            type: Datatypes.DATE,
             allowNull: true
         }
     },

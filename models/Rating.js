@@ -1,37 +1,14 @@
 const sequelize = require("../dbconfig");
 const Datatypes = require('sequelize');
-const Joi = require("joi");
-const { User} = require('./User');
 
-const Client = sequelize.sequelize.define(
-    'clients',
+const Rating = sequelize.sequelize.define(
+    'job_ratings',
     {
         id: {
             autoIncrement: true,
             type: Datatypes.BIGINT.UNSIGNED,
             allowNull: false,
             primaryKey: true
-        },
-        username: {
-            type: Datatypes.STRING(191),
-            allowNull: true,
-            unique: "clients_username_unique"
-        },
-        gender: {
-            type: Datatypes.ENUM('MALE', 'FEMALE', 'TRANS-GENDER', 'OTHER'),
-            allowNull: true
-        },
-        dob: {
-            type: Datatypes.DATEONLY,
-            allowNull: true
-        },
-        citizenship: {
-            type: Datatypes.STRING(191),
-            allowNull: true
-        },
-        address: {
-            type: Datatypes.STRING(191),
-            allowNull: true
         },
         user_id: {
             type: Datatypes.BIGINT.UNSIGNED,
@@ -40,6 +17,18 @@ const Client = sequelize.sequelize.define(
                 model: 'users',
                 key: 'id'
             }
+        },
+        job_id: {
+            type: Datatypes.BIGINT.UNSIGNED,
+            allowNull: false,
+            references: {
+                model: 'jobs',
+                key: 'id'
+            }
+        },
+        rating: {
+            type: Datatypes.INTEGER,
+            allowNull: true
         },
         created_by: {
             type: Datatypes.INTEGER.UNSIGNED,
@@ -73,13 +62,10 @@ const Client = sequelize.sequelize.define(
             type: Datatypes.DATE,
             allowNull: true
         }
-    },
-    {
+    },{
         sequelize,
-        tableName: 'clients',
-        timestamps: true,
-        paranoid: true,
-        underscored: true,
+        tableName: 'job_ratings',
+        timestamps: false,
         indexes: [
             {
                 name: "PRIMARY",
@@ -90,47 +76,22 @@ const Client = sequelize.sequelize.define(
                 ]
             },
             {
-                name: "clients_user_id_foreign",
+                name: "ratings_job_id_foreign",
+                using: "BTREE",
+                fields: [
+                    {name: "job_id"},
+                ]
+            },
+            {
+                name: "ratings_user_id_foreign",
                 using: "BTREE",
                 fields: [
                     {name: "user_id"},
                 ]
             },
-            {
-                name: "clients_username_unique",
-                unique: true,
-                using: "BTREE",
-                fields: [
-                    {name: "username"},
-                ]
-
-            }
         ]
+
     }
 );
 
-function validateClient(client) {
-    const schema = Joi.object({
-        username: Joi.string()
-            .min(3)
-            .max(191)
-            .required(),
-        gender: Joi.string()
-            .required(),
-        dob: Joi.date()
-            .required(),
-        citizenship: Joi.string()
-            .required(),
-        address: Joi.string()
-            .required(),
-        user_id: Joi.number()
-            .required()
-    }).unknown(true);
-
-    return schema.validate(client);
-}
-
-Client.belongsTo(User, {foreign_key : 'user_id'});
-
-exports.Client = Client;
-exports.validateClient = validateClient;
+exports.Rating = Rating;

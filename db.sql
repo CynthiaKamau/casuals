@@ -139,11 +139,11 @@ CREATE TABLE "public"."jobs" (
   "created_at" timestamp(0),
   "updated_at" timestamp(0),
   "deleted_at" timestamp(0),
+  "restored_at" timestamp(0),
   "created_by" int8,
   "updated_by" int8,
   "deleted_by" int8,
   "restored_by" int8,
-  "restored_at" timestamp(0),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("client_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY ("worker_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -154,6 +154,32 @@ CREATE TABLE "public"."jobs" (
 )
 ;
 
-
 ALTER TABLE "public"."jobs" 
+  OWNER TO "postgres";
+
+CREATE SEQUENCE job_ratings_id_seq;
+CREATE TABLE "public"."job_ratings" (
+  "id" int8 NOT NULL DEFAULT nextval('job_ratings_id_seq'::regclass),
+  "user_id" int8 NOT NULL,
+  "job_id" int8 NOT NULL,
+  "rating" int8 NOT NULL,
+  "created_at" timestamp(0),
+  "updated_at" timestamp(0),
+  "deleted_at" timestamp(0),
+  "restored_at" timestamp(0),
+  "created_by" int8,
+  "updated_by" int8,
+  "deleted_by" int8,
+  "restored_by" int8,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("job_id") REFERENCES "public"."jobs" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("created_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("updated_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("deleted_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("restored_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+)
+;
+
+ALTER TABLE "public"."job_ratings" 
   OWNER TO "postgres";

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { verify } = require('../middleware/jwt/jwt');
 const {User, registrationValidation} = require('../models/User');
 const { Client} = require('../models/Client');
+const { Rating} = require('../models/Rating');
 const bcrypt = require('bcryptjs');
 
 //all clients
@@ -137,6 +138,18 @@ router.delete('/client/:id', verify, async (req,res) => {
 
     client.destroy().then(response => res.status(200).json({ success : true, message : 'Client account deleted successfully'}))
     .catch(error => res.status(500).json({ success : false, error : error}) )
+
+});
+
+//client ratings
+router.get('/client/ratings/:id', verify, async (req,res) => {
+
+    await Client.findOne({
+        where: { user_id : req.params.id},
+        include: { model: User, attributes: { exclude: ['password'] } },
+        include: { model : Rating}
+    }).then(client => res.status(200).json({ success: true, data: client}))
+    .catch(error => res.status(500).json({error: error}));
 
 });
 

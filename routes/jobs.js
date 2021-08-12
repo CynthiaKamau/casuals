@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const {Job, validateJob} = require('../models/Jobs');
+const {Job, validateJob} = require('../models/Job');
 const { verify } = require('../middleware/jwt/jwt');
 
 //all jobs

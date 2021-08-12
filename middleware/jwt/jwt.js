@@ -3,6 +3,10 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 exports.verify = (req, res, next) => {
 
+    if(!req.headers.authorization) {
+        return res.status(401).send('No token provided');
+    }
+
     const token = req.headers.authorization.split(" ")[1];
 
     if(token) {
