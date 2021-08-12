@@ -135,6 +135,7 @@ CREATE TABLE "public"."jobs" (
   "worker_id" int8,
   "preferance" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "status" bool NOT NULL DEFAULT true,
+  "rating" int8 NOT NULL,
   "location" varchar(255) COLLATE "pg_catalog"."default",
   "created_at" timestamp(0),
   "updated_at" timestamp(0),

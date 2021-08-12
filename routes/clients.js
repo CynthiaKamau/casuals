@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { verify } = require('../middleware/jwt/jwt');
 const {User, registrationValidation} = require('../models/User');
 const { Client} = require('../models/Client');
-const { Rating} = require('../models/Rating');
+const { Job} = require('../models/Job');
 const bcrypt = require('bcryptjs');
 
 //all clients
@@ -20,7 +20,8 @@ router.get('/client/:id', verify, async (req,res) => {
 
     await Client.findOne({
         where: { user_id : req.params.id},
-        include: { model: User, attributes: { exclude: ['password'] } }
+        include: { model: User, attributes: { exclude: ['password'] } },
+        include: { model : Job}
     }).then(client => res.status(200).json({ success: true, data: client}))
     .catch(error => res.status(500).json({error: error}));
 
@@ -142,12 +143,11 @@ router.delete('/client/:id', verify, async (req,res) => {
 });
 
 //client ratings
-router.get('/client/ratings/:id', verify, async (req,res) => {
+router.get('/client/jobs/:id', verify, async (req,res) => {
 
-    await Client.findOne({
-        where: { user_id : req.params.id},
-        include: { model: User, attributes: { exclude: ['password'] } },
-        include: { model : Rating}
+    await User.findOne({
+        where: { id : req.params.id},
+        attributes: {exclude: ['password']},
     }).then(client => res.status(200).json({ success: true, data: client}))
     .catch(error => res.status(500).json({error: error}));
 

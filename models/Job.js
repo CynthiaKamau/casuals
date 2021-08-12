@@ -1,7 +1,8 @@
 const sequelize = require("../dbconfig");
-const Datatypes= require("sequelize");
+const Datatypes = require("sequelize");
 const Joi = require("joi");
-const { Rating } = require("./Rating");
+const { User } = require("./User");
+const { Rating } = require('./Rating');
 
 const Job = sequelize.sequelize.define(
     'jobs',
@@ -96,14 +97,14 @@ const Job = sequelize.sequelize.define(
                 name: "jobs_client_id_foreign",
                 using: "BTREE",
                 fields: [
-                    {name: "user_id"},
+                    {name: "client_id"},
                 ]
             },
             {
                 name: "jobs_worker_id_foreign",
                 using: "BTREE",
                 fields: [
-                    {name: "user_id"},
+                    {name: "worker_id"},
                 ]
             }
         ]
@@ -132,9 +133,11 @@ function validateJob(job) {
     }).unknown(true);
 
     return schema.validate(job);
-}
+};
 
-Job.hasOne(Rating, { foreign_key : 'job_id'});
+Job.belongsTo(User, {foreign_key :'client_id', foreign_key : 'role_id'}); //one who added the job
+Job.hasOne(User, {foreign_key: 'worker_id', foreign_key : 'role_id' }); // one who did the job
 
 exports.Job = Job;
 exports.validateJob = validateJob;
+

@@ -1,7 +1,7 @@
 const sequelize = require("../dbconfig");
 const Datatypes = require('sequelize');
 
-const Roles = sequelize.sequelize.define(
+const Role = sequelize.sequelize.define(
     'roles',
     {
         id: {
@@ -49,4 +49,4 @@ const Roles = sequelize.sequelize.define(
     }
 );
 
-exports.Roles = Roles;
+exports.Role = Role;
