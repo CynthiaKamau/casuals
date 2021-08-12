@@ -3,14 +3,13 @@ const { verify } = require('../middleware/jwt/jwt');
 const {User, registrationValidation} = require('../models/User');
 const { Worker} = require('../models/Worker');
 const bcrypt = require('bcryptjs');
-const { request } = require('express');
 
 //all workers
 router.get('/workers', verify, async (req,res) => {
 
     await Worker.findAndCountAll({
         include: { model: User, attributes: { exclude: ['password'] } }
-    }).then(workers => res.status(200).json({data: workers}))
+    }).then(workers => res.status(200).json({ success: true, data: workers}))
     .catch(error => res.status(500).json({error: error}));
 
 });
@@ -21,7 +20,7 @@ router.get('/worker/:id', verify, async (req,res) => {
     await Worker.findOne({
         where: { user_id : req.params.id},
         include: { model: User, attributes: { exclude: ['password'] } }
-    }).then(workers => res.status(200).json({data: workers}))
+    }).then(workers => res.status(200).json({ success: true, data: workers}))
     .catch(error => res.status(500).json({error: error}));
 
 });

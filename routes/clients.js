@@ -9,7 +9,7 @@ router.get('/clients', verify, async (req,res) => {
 
     await Client.findAndCountAll({
         include: { model: User, attributes: { exclude: ['password'] } }
-    }).then(clients => res.status(200).json({data: clients})
+    }).then(clients => res.status(200).json({ success: true, data: clients})
     ).catch(error => res.status(500).json({error: error}));
 
 });
@@ -20,7 +20,7 @@ router.get('/client/:id', verify, async (req,res) => {
     await Client.findOne({
         where: { user_id : req.params.id},
         include: { model: User, attributes: { exclude: ['password'] } }
-    }).then(client => res.status(200).json({data: client}))
+    }).then(client => res.status(200).json({ success: true, data: client}))
     .catch(error => res.status(500).json({error: error}));
 
 });

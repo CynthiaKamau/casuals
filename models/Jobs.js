@@ -2,7 +2,7 @@ const sequelize = require("../dbconfig");
 const Sequelize = require("sequelize");
 const Joi = require("joi");
 
-const Jobs = sequelize.sequelize.define(
+const Job = sequelize.sequelize.define(
     'jobs',
     {
         id: {
@@ -55,10 +55,6 @@ const Jobs = sequelize.sequelize.define(
             type: Sequelize.BOOLEAN,
             allowNull: false,
             defaultValue: 1
-        },
-        ratings: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
         },
         created_by: {
             type: Sequelize.INTEGER.UNSIGNED,
@@ -131,12 +127,11 @@ function validateJob(job) {
             .required(),
         client_id: Joi.number()
             .required(),
-        worker_id: Joi.number()
-            .required()
-    });
+        worker_id: Joi.number(),
+    }).unknown(true);
 
     return schema.validate(job);
 }
 
-exports.Jobs = Jobs;
+exports.Job = Job;
 exports.validateJob = validateJob;

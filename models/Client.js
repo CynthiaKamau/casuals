@@ -125,7 +125,7 @@ function validateClient(client) {
             .required(),
         user_id: Joi.number()
             .required()
-    });
+    }).unknown(true);
 
     return schema.validate(client);
 }
