@@ -1,6 +1,9 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('skills', {
+const sequelize = require("../dbconfig");
+const DataTypes = require('sequelize');
+
+const Role = sequelize.sequelize.define(
+  'roles',
+  {
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
@@ -26,17 +29,20 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'skills',
+    tableName: 'roles',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "skills_pkey",
+        name: "roles_pkey",
         unique: true,
         fields: [
           { name: "id" },
         ]
       },
     ]
-  });
-};
+  }
+);
+
+exports.Role = Role;
+

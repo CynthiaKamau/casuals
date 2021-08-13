@@ -1,7 +1,8 @@
 const router = require('express').Router();
-const {Job, validateJob} = require('../models/Job');
+const {Job, validateJob} = require('../models/jobs');
 const { verify } = require('../middleware/jwt/jwt');
-const { User } = require('../models/User');
+const { User } = require('../models/users');
+
 //all jobs
 router.get('/jobs', verify, async (req,res) => {
 
@@ -15,10 +16,15 @@ router.get('/jobs', verify, async (req,res) => {
 router.get('/job/:id', verify, async (req,res) => {
 
     await Job.findOne({
-        where: { id : req.params.id},
-        include: { model : User, attributes : {exclude : ['password']} }
+        where: { worker_id : req.params.id},
+        include: 
+        [ { model : User, as: 'worker'} ]
+        // { model : User, require:true, attributes : {exclude : ['password']} }
     }).then(response => res.status(200).json({ success: true, data : response}))
-    .catch(error => res.status(500).json({error : error}))
+    .catch(error =>{ 
+        console.log(error)
+        res.status(500).json({error : error})
+    })
 })
 
 //create job

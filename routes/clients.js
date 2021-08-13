@@ -1,15 +1,18 @@
 const router = require('express').Router();
 const { verify } = require('../middleware/jwt/jwt');
-const {User, registrationValidation} = require('../models/User');
-const { Client} = require('../models/Client');
-const { Job} = require('../models/Job');
+const {User, registrationValidation} = require('../models/users');
+const { Client} = require('../models/clients');
+const { Job} = require('../models/jobs');
 const bcrypt = require('bcryptjs');
 
 //all clients
 router.get('/clients', verify, async (req,res) => {
 
     await Client.findAndCountAll({
-        include: { model: User, attributes: { exclude: ['password'] } }
+        include: [{ model: User,
+            required : true,
+            attributes: { exclude: ['password'] } 
+        }]
     }).then(clients => res.status(200).json({ success: true, data: clients})
     ).catch(error => res.status(500).json({error: error}));
 
@@ -20,10 +23,9 @@ router.get('/client/:id', verify, async (req,res) => {
 
     await Client.findOne({
         where: { user_id : req.params.id},
-        include: { model: User, attributes: { exclude: ['password'] } },
-        include: { model : Job}
+        include: { model: User, attributes: { exclude: ['password'] }, include : Job },
     }).then(client => res.status(200).json({ success: true, data: client}))
-    .catch(error => res.status(500).json({error: error}));
+    .catch( error => res.status(400).json({error}));
 
 });
 
@@ -145,9 +147,9 @@ router.delete('/client/:id', verify, async (req,res) => {
 //client ratings
 router.get('/client/jobs/:id', verify, async (req,res) => {
 
-    await User.findOne({
-        where: { id : req.params.id},
-        attributes: {exclude: ['password']},
+    await Client.findOne({
+        where: { user_id : req.params.id},
+        include: { model: User, attributes: { exclude: ['password'] } }
     }).then(client => res.status(200).json({ success: true, data: client}))
     .catch(error => res.status(500).json({error: error}));
 

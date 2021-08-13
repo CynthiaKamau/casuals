@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const { verify } = require('../middleware/jwt/jwt');
-const {User, registrationValidation} = require('../models/User');
-const { Worker} = require('../models/Worker');
+const {User, registrationValidation} = require('../models/users');
+const { Worker} = require('../models/workers');
 const bcrypt = require('bcryptjs');
+const { Job} = require('../models/jobs');
 
 //all workers
 router.get('/workers', verify, async (req,res) => {
@@ -19,9 +20,9 @@ router.get('/worker/:id', verify, async (req,res) => {
 
     await Worker.findOne({
         where: { user_id : req.params.id},
-        include: { model: User, attributes: { exclude: ['password'] } }
-    }).then(workers => res.status(200).json({ success: true, data: workers}))
-    .catch(error => res.status(500).json({error: error}));
+        include: { model: User, attributes: { exclude: ['password'] }, include : Job },
+    }).then(client => res.status(200).json({ success: true, data: client}))
+    .catch( error => res.status(400).json({error}));
 
 });
 
