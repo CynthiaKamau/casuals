@@ -67,6 +67,7 @@ router.post('/client', verify, async (req,res) => {
                 res.status(200).json({
                     message: "You have successfully been registered.",
                     success: true,
+                    user : response
                 });
             })
             .catch((err) => {
