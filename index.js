@@ -6,7 +6,7 @@ require("./dbconfig");
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5001;
 const cookieOptions = {credentials:true, origin: process.env.URL || '*'};
 
 app.use(bodyParser.urlencoded({ extended: true }));

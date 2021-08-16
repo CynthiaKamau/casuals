@@ -17,8 +17,7 @@ router.get('/job/:id', verify, async (req,res) => {
 
     await Job.findOne({
         where: { worker_id : req.params.id},
-        include: 
-        [ { model : User, as: 'worker'} ]
+        include: [ { model : User, as: 'worker'} ]
         // { model : User, require:true, attributes : {exclude : ['password']} }
     }).then(response => res.status(200).json({ success: true, data : response}))
     .catch(error =>{ 
