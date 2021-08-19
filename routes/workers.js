@@ -16,7 +16,7 @@ router.get('/workers', verify, async (req,res) => {
 });
 
 //get worker
-router.get('/worker/:id', verify, async (req,res) => {
+router.get('/worker/:id', async (req,res) => {
 
     await Worker.findOne({
         where: { user_id : req.params.id},
@@ -32,7 +32,7 @@ router.post('/worker', verify, async (req,res) => {
     let { error } = registrationValidation(req.body);
 
     if(error) {
-        return res.status(400).send(error.details[0].message);
+        return res.status(400).json({message : error.details[0].message});
     }
 
         const salt = await bcrypt.genSalt(10);

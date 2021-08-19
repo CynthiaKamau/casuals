@@ -30,12 +30,12 @@ router.get('/client/:id', verify, async (req,res) => {
 });
 
 //create client
-router.post('/client', verify, async (req,res) => {
+router.post('/client', async (req,res) => {
 
     let { error } = registrationValidation(req.body);
 
     if(error) {
-        return res.status(400).send(error.details[0].message);
+        return res.status(400).json({ message : error.details[0].message});
     }
 
         const salt = await bcrypt.genSalt(10);
@@ -71,10 +71,10 @@ router.post('/client', verify, async (req,res) => {
                 });
             })
             .catch((err) => {
-                res.status(500).json(err);
+                res.status(500).json({status : 500, message : err});
             })
        
-        }).catch( error => res.status(500).json(error));
+        }).catch( error => res.status(500).json({status : 500, message : error}) );
     
 
 });

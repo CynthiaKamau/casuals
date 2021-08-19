@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require("body-parser");
 require("./dbconfig");
@@ -11,6 +12,7 @@ const cookieOptions = {credentials:true, origin: process.env.URL || '*'};
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use('*', cors());
 
 //Import Routes
 const authRoute = require('./routes/auth');
