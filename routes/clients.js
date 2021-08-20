@@ -35,7 +35,7 @@ router.post('/client', async (req,res) => {
     let { error } = registrationValidation(req.body);
 
     if(error) {
-        return res.status(400).json({ message : error.details[0].message});
+        return res.status(400).json({ status : 400, message : error.details[0].message});
     }
 
         const salt = await bcrypt.genSalt(10);

@@ -10,17 +10,17 @@ router.post('/login', async (req,res) => {
 
     if(error) {
 
-        return res.status(400).json({ message: error.details[0].message});
+        return res.status(400).json({ status : 400, message: error.details[0].message});
     }
 
     const user = await User.findOne({ where : { phone_number: req.body.phone_number} });
 
-    if(!user) return res.status(400).json({ success : false , message :'Phone number does not exsist'});
+    if(!user) return res.status(400).json({ status : 400, message :'Phone number does not exsist'});
 
     //check if password is correct
     const validPwd = await bcrypt.compare(req.body.password, user.password);
 
-    if(!validPwd) return res.status(400).json({ success : false , message :'Invalid Password'});
+    if(!validPwd) return res.status(400).json({ status : 400, message :'Invalid Password'});
 
     //create and assign token
     const token = jwt.sign({id: user.id, phone_number: user.phone_number, email: user.email, role_id: user.role_id, first_name: user.first_name, last_name: user.last_name}, process.env.SECRET_KEY);
