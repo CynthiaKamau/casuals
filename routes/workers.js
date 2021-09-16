@@ -6,9 +6,9 @@ const bcrypt = require('bcryptjs');
 const { Job} = require('../models/jobs');
 
 //all workers
-router.get('/workers', verify, async (req,res) => {
+router.get('/workers', async (req,res) => {
 
-    await Worker.findAndCountAll({
+    await Worker.findAll({
         include: { model: User, attributes: { exclude: ['password'] } }
     }).then(workers => res.status(200).json({ success: true, data: workers}))
     .catch(error => res.status(500).json({error: error}));

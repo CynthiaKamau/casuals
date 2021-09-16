@@ -4,9 +4,9 @@ const { verify } = require('../middleware/jwt/jwt');
 const { User } = require('../models/users');
 
 //all jobs
-router.get('/jobs', verify, async (req,res) => {
+router.get('/jobs', async (req,res) => {
 
-    await Job.findAndCountAll()
+    await Job.findAll()
     .then(jobs => res.status(200).json({ success: true, data: jobs}))
     .catch(error => res.status(500).json({error: error}));
 
@@ -43,7 +43,7 @@ router.post('/job', verify, async (req, res) => {
         client_id: req.body.client_id,
         worker_id: req.body.worker_id,
         preferance: req.body.preferance,
-        ratings: req.body.ratings,
+        rating: req.body.rating,
         location: req.body.location,
         status: req.body.status
     }).then( response => res.status(201).json({
@@ -70,7 +70,7 @@ router.put('/job/:id', verify, async (req,res) => {
         client_id: req.body.client_id,
         worker_id: req.body.worker_id,
         preferance: req.body.preferance,
-        ratings: req.body.ratings,
+        rating: req.body.rating,
         location: req.body.location,
         status: req.body.status
     }, { returning: true, where : { id : req.params.id }}

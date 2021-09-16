@@ -21,6 +21,10 @@ const Job = sequelize.sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false
     },
+    rating: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     date_added: {
       type: DataTypes.DATEONLY,
       allowNull: false
@@ -107,53 +111,53 @@ const Job = sequelize.sequelize.define(
       allowNull: true
     }
   }, {
-    sequelize,
-    tableName: 'jobs',
-    schema: 'public',
-    timestamps: false,
-    underscored: true,
-    indexes: [
-      {
-        name: "jobs_pkey",
-        unique: true,
-        fields: [
-          { name: "id" },
-        ]
-      },
-    ]
-  }
+  sequelize,
+  tableName: 'jobs',
+  schema: 'public',
+  timestamps: false,
+  underscored: true,
+  indexes: [
+    {
+      name: "jobs_pkey",
+      unique: true,
+      fields: [
+        { name: "id" },
+      ]
+    },
+  ]
+}
 );
 
 function validateJob(job) {
   const schema = Joi.object({
-      title: Joi.string()
-          .min(3)
-          .max(191)
-          .required(),
-      description: Joi.string()
-          .min(3)
-          .max(250)
-          .required(),
-      location: Joi.string()
-          .required(),
-      date_added: Joi.date()
-          .required(),
-      validity: Joi.date()
-          .required(),
-      client_id: Joi.number()
-          .required(),
-      worker_id: Joi.number(),
+    title: Joi.string()
+      .min(3)
+      .max(191)
+      .required(),
+    description: Joi.string()
+      .min(3)
+      .max(250)
+      .required(),
+    location: Joi.string()
+      .required(),
+    date_added: Joi.date()
+      .required(),
+    validity: Joi.date()
+      .required(),
+    client_id: Joi.number()
+      .required(),
+    worker_id: Joi.number(),
   }).unknown(true);
 
   return schema.validate(job);
 };
 
 Job.associate = (models) => {
-  Job.hasOne(models.User, {foreignKey: "worker_id"});
+  Job.hasOne(models.User, { foreignKey: "worker_id" });
 }
 
 Job.associate = (models) => {
-  Job.belongsTo(models.User, {foreignKey: "client_id"});
+  Job.belongsTo(models.User, { foreignKey: "client_id" });
 }
 
 module.exports.Job = Job;

@@ -6,9 +6,9 @@ const { Job} = require('../models/jobs');
 const bcrypt = require('bcryptjs');
 
 //all clients
-router.get('/clients', verify, async (req,res) => {
+router.get('/clients', async (req,res) => {
 
-    await Client.findAndCountAll({
+    await Client.findAll({
         include: [{ model: User,
             required : true,
             attributes: { exclude: ['password'] } 
