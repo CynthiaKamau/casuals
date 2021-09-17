@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const { Job} = require('../models/jobs');
 
 //all workers
-router.get('/workers', async (req,res) => {
+router.get('/workers', verify, async (req,res) => {
 
     await Worker.findAll({
         include: { model: User, attributes: { exclude: ['password'] } }
@@ -15,7 +15,7 @@ router.get('/workers', async (req,res) => {
 
 });
 
-//get worker
+//get worker pass user_id
 router.get('/worker/:id', async (req,res) => {
 
     await Worker.findOne({

@@ -4,7 +4,7 @@ const { verify } = require('../middleware/jwt/jwt');
 const { User } = require('../models/users');
 
 //all jobs
-router.get('/jobs', async (req,res) => {
+router.get('/jobs', verify, async (req,res) => {
 
     await Job.findAll()
     .then(jobs => res.status(200).json({ success: true, data: jobs}))

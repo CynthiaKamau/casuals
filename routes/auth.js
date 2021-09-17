@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { User, loginValidation } = require('../models/users');
+const { Role } = require('../models/roles');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { verify } = require('../middleware/jwt/jwt');
@@ -34,7 +35,14 @@ router.get('/auth', verify, async (req, res) => {
 
     try {
 
-        let user = await User.findOne({ where: { id: req.user.id }, attributes: { exclude: ['password'] } });
+        let user = await User.findOne({
+            where: { id: req.user.id },
+            attributes: { exclude: ['password'] },
+            include: [{
+                model : Role,
+                required :true
+            }]
+        });
 
         if (user) {
             return res.status(200).json({ success: true, message: user })
