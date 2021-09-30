@@ -73,7 +73,7 @@ router.post('/client', async (req, res) => {
                 status: req.body.status
             });
                     // await transaction.commit();
-            res.json({
+            res.status(201).json({
                 message: "You have successfully been registered.",
                 success: true,
                 user: client
@@ -119,7 +119,7 @@ router.put('/client/:id', verify, async (req, res) => {
                 return res.status(400).json({ success: false, error: 'User profile does not exist!'});
             }
 
-            await Client.update({
+            let client = await Client.update({
 
                 user_id: req.params.id,
                 username: req.body.username,
@@ -128,10 +128,11 @@ router.put('/client/:id', verify, async (req, res) => {
                 citizenship: req.body.citizenship,
                 address: req.body.address,
                 status: req.body.status
-            }, { returning: true, where: { user_id: user[1].id } });
-            res.status(200).json({
+            }, { returning: true, plain: true, where: { user_id: user[1].id } });
+            res.json({
                 message: "Your profile has been updated successfully .",
                 success: true,
+                user: client[1]
             });            
         } catch (error) {
             res.status(500).json({ success: false, message: error }); 

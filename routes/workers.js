@@ -62,13 +62,15 @@ router.post('/worker', verify, async (req,res) => {
             });
 
             try {
-                await Worker.create({
+                let worker = await Worker.create({
                     user_id : user.id,
                     username: req.body.username,
                     status: req.body.status
                 });
 
-                res.json({success: true, message: "You have successfully been registered."});                
+                res.status(201).json({success: true,
+                    message: "You have successfully been registered.",
+                    user: worker });                
             } catch (error) {
                 res.status(500).json({success: false, error :error});
             }
@@ -123,7 +125,10 @@ router.put('/worker/:id', verify, async (req,res) => {
 
             }, { returning : true, where : { user_id : user[1].id }});
 
-            res.json({ success: true, message: "Your profile has been updated successfully."});
+            res.json({ success: true,
+                message: "Your profile has been updated successfully.",
+                user: worker[1]
+            });
             
         } catch (error) {
             res.status(500).json({ success: false, error: error});

@@ -56,7 +56,10 @@ router.post('/job', verify, async (req, res) => {
             location: req.body.location,
             status: req.body.status
         })
-        res.status(201).json({ success: true, message: "Job created successfully"}) 
+        res.status(201).json({ 
+            success: true,
+            message: "Job created successfully",
+            job: job}) 
     } catch (error) {
         res.status(500).json({ success: false, error : error });  
     }
@@ -85,9 +88,11 @@ router.put('/job/:id', verify, async (req,res) => {
             rating: req.body.rating,
             location: req.body.location,
             status: req.body.status
-            }, { returning: true, where : { id : req.params.id }
+            }, { returning: true, plain: true, where : { id : req.params.id }
         })
-        res.json({success: true, message: "Job updated successfully" })  
+        res.json({success: true,
+            message: "Job updated successfully",
+            job: job[1] })  
     } catch (error) {
         res.status(500).json({ success : false, error :error }) 
     }
