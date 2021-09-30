@@ -109,9 +109,15 @@ router.put('/client/:id', verify, async (req, res) => {
             role_id: req.body.role_id,
             status: req.body.status,
     
-        }, { returning: true, where: { id: req.params.id } })
+        }, { returning: true, plain: true, where: { id: req.params.id } })
 
         try {
+
+            let client_profile = await Client.findOne({ where : { user_id : user[1].id}});
+
+            if(!client_profile) {
+                return res.status(400).json({ success: false, error: 'User profile does not exist!'});
+            }
 
             await Client.update({
 
@@ -122,7 +128,7 @@ router.put('/client/:id', verify, async (req, res) => {
                 citizenship: req.body.citizenship,
                 address: req.body.address,
                 status: req.body.status
-            }, { returning: true, where: { user_id: req.params.id } });
+            }, { returning: true, where: { user_id: user[1].id } });
             res.status(200).json({
                 message: "Your profile has been updated successfully .",
                 success: true,
