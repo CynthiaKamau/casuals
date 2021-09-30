@@ -1,0 +1,19 @@
+#this file will help you mirror your code to the container and changes reflect immediately 
+version: '3'
+services:
+ web:
+  build: # specify the build file
+   context: .
+   dockerfile: Dockerfile.dev # specify file
+  ports:
+   - "3000:3000"
+  volumes:
+   - /app/casuals-api/node_modules # do not map what is in the node modules folder
+   - .:/app/casuals-api
+ tests:
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  volumes:
+    - /app/casuals-api/node_modules
+    

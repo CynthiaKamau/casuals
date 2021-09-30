@@ -1,0 +1,6 @@
+FROM node:alpine
+WORKDIR '/app/casuals-api'
+COPY package.json /app/casuals-api
+RUN npm install
+COPY . /app/casuals-api
+CMD ["npm", "run", "start"]
