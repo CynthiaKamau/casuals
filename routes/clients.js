@@ -16,7 +16,7 @@ router.get('/clients', verify, async (req, res) => {
                 attributes: { exclude: ['password'] }
             }]
         })
-        res.json({ success: true, data: clients });
+        res.json({ success: true, message: clients });
     } catch (error) {
         res.status(500).json({ success: false, error: error });
     }
@@ -24,14 +24,14 @@ router.get('/clients', verify, async (req, res) => {
 });
 
 //get client pass user_id
-router.get('/client/:id', verify, async (req, res) => {
+router.get('/client/:id', async (req, res) => {
 
     try {
         let client = await Client.findOne({
             where: { user_id: req.params.id },
             include: { model: User, attributes: { exclude: ['password'] }, include: Job },
         })
-        res.json({ success: true, data: client });
+        res.json({ success: true, message: client });
         
     } catch (error) {
         res.status(500).json({ success: false, error :error });
@@ -166,7 +166,7 @@ router.get('/client/jobs/:id', verify, async (req, res) => {
         where: { user_id: req.params.id },
         include: { model: User, attributes: { exclude: ['password'] } }
         });
-        res.json({ success: true, data: client });
+        res.json({ success: true, message: client });
     } catch (error) {
         res.status(500).json({ success: false, error: error });
     }

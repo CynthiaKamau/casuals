@@ -9,7 +9,8 @@ const { Job} = require('../models/jobs');
 router.get('/workers', verify, async (req,res) => {
     try {
         let workers = await Worker.findAll({
-            include: { model: User, attributes: { exclude: ['password'] } }
+            include: [{ model: User, attributes: { exclude: ['password'], required: false },
+                        model : Job , as: 'jobs', }],
         })
         res.json({ success: true, message: workers});
         
@@ -25,7 +26,8 @@ router.get('/worker/:id', async (req,res) => {
     try {
         let worker = await Worker.findOne({
             where: { user_id : req.params.id},
-            include: { model: User, attributes: { exclude: ['password'] }, include : Job },
+            include: [{ model: User, attributes: { exclude: ['password'], required: false },
+                        model : Job , as: 'jobs', }],
         })
         res.json({ success: true, message: worker});  
     } catch (error) {

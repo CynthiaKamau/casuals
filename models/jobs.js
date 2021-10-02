@@ -152,13 +152,8 @@ function validateJob(job) {
   return schema.validate(job);
 };
 
-Job.associate = (models) => {
-  Job.hasOne(models.User, { foreignKey: "worker_id" });
-}
-
-Job.associate = (models) => {
-  Job.belongsTo(models.User, { foreignKey: "client_id" });
-}
+Job.belongsTo(User, { foreignKey: "worker_id" });
+Job.belongsTo(User, { foreignKey: "client_id" });
 
 module.exports.Job = Job;
 exports.validateJob = validateJob;

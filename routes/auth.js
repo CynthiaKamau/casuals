@@ -15,7 +15,11 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ status: 400, message: error.details[0].message });
     }
 
-    const user = await User.findOne({ where: { phone_number: req.body.phone_number } });
+    const user = await User.findOne({
+        where: { phone_number: req.body.phone_number },
+        include: [{ model : Role, required: true }]
+        // attributes: ['first_name', 'middle_name', 'last_name', 'email', 'phone_number', 'role_id', 'status']
+    });
 
     if (!user) return res.status(400).json({ status: 400, message: 'Phone number does not exsist' });
 
@@ -39,8 +43,8 @@ router.get('/auth', verify, async (req, res) => {
             where: { id: req.user.id },
             attributes: { exclude: ['password'] },
             include: [{
-                model : Role,
-                required :true
+                model: Role,
+                required: true
             }]
         });
 
@@ -56,8 +60,37 @@ router.get('/auth', verify, async (req, res) => {
     }
 });
 
+router.put("/update-profile", verify, async (req, res) => {
+
+    let user = await User.findByPk(req.body.id);
+
+    if(!user) return res.status(500).json({ success: false, error: 'User does not exist!'})
+
+    try {
+
+        let u = await User.update({
+            first_name: req.body.first_name,
+            middle_name: req.body.middle_name,
+            last_name: req.body.last_name,
+            email: req.body.email,
+            phone_number: req.body.phone_number,
+            status: req.body.status,
+        }, {returning: true, plain:true, where: { id: req.body.id }})
+        res.json({
+            message: "Your profile has been updated successfully.",
+            success: true,
+            user: u[1]
+        })
+        
+    } catch (error) {
+        res.status(500).json({ success: false, message: error });  
+    }
+})
+
 router.post('/reset-password', async (req, res) => {
 
 });
+
+//add update profile
 
 module.exports = router;

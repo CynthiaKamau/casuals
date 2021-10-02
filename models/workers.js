@@ -2,6 +2,7 @@ const sequelize = require("../dbconfig");
 const DataTypes = require('sequelize');
 const Joi = require("joi");
 const { User } = require('./users');
+const { Job } = require('./jobs');
 
 const Worker = sequelize.sequelize.define(
   'workers',
@@ -145,6 +146,7 @@ function validateWorker(Worker) {
 }
 
 Worker.belongsTo(User, { foreignKey : 'user_id'});
+Worker.hasMany(Job, { foreignKey: 'worker_id', as: 'jobs'});
 
 exports.Worker = Worker;
 exports.validateWorker = validateWorker;

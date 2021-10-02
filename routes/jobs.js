@@ -2,12 +2,13 @@ const router = require('express').Router();
 const {Job, validateJob} = require('../models/jobs');
 const { verify } = require('../middleware/jwt/jwt');
 const { User } = require('../models/users');
+const { Worker } = require('../models/workers');
 
 //all jobs
 router.get('/jobs', verify, async (req,res) => {
 
     try {
-        let jobs = await Job.findAll()
+        let jobs = await Job.findAll({ include: { model : Worker, require: true, as: 'service-providers' }})
         res.json({ success: true, message: jobs});
         
     } catch (error) {
@@ -17,13 +18,12 @@ router.get('/jobs', verify, async (req,res) => {
 });
 
 //get job
-router.get('/job/:id', verify, async (req,res) => {
+router.get('/job/:id', async (req,res) => {
 
     try {
         let job = await Job.findOne({
             where: { id : req.params.id},
-            // include: [ { model : User, as: 'worker'} ]
-            // { model : User, require:true, attributes : {exclude : ['password']} }
+            include: [ { model : User, require: false, attributes : {exclude : ['password']} }]
         })
         res.json({ success: true, message: job});
         
