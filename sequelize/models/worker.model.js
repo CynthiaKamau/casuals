@@ -1,65 +1,57 @@
-const sequelize = require("../dbconfig");
-const DataTypes = require("sequelize");
+const DataTypes = require('sequelize');
 const Joi = require("joi");
-const { User } = require('./users');
-const { Rating } = require('./job_ratings');
 
-const Job = sequelize.sequelize.define(
-  'jobs',
-  {
+module.exports = (sequelize) => {
+  sequelize.define('worker',{
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
-    title: {
+    username: {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    description: {
+    gender: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: true
     },
-    rating: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    date_added: {
+    dob: {
       type: DataTypes.DATEONLY,
-      allowNull: false
+      allowNull: true
     },
-    validity: {
-      type: DataTypes.DATEONLY,
-      allowNull: false
-    },
-    client_id: {
+    user_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
-    worker_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      references: {
-        model: 'users',
-        key: 'id'
-      }
-    },
-    preferance: {
+    profile_photo: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: true
     },
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true
     },
-    location: {
+    address: {
       type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    citizenship: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    skills: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    rate: {
+      type: DataTypes.BIGINT,
       allowNull: true
     },
     created_at: {
@@ -74,11 +66,15 @@ const Job = sequelize.sequelize.define(
       type: DataTypes.DATE,
       allowNull: true
     },
+    restored_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     created_by: {
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -86,7 +82,7 @@ const Job = sequelize.sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -94,7 +90,7 @@ const Job = sequelize.sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -102,59 +98,50 @@ const Job = sequelize.sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
-    },
-    restored_at: {
-      type: DataTypes.DATE,
-      allowNull: true
     }
   }, {
   sequelize,
-  tableName: 'jobs',
+  tableName: 'workers',
   schema: 'public',
   timestamps: false,
   underscored: true,
   indexes: [
     {
-      name: "jobs_pkey",
+      name: "worker_profiles_pkey",
       unique: true,
       fields: [
         { name: "id" },
       ]
     },
   ]
+})
 }
-);
 
-function validateJob(job) {
+function validateWorker(Worker) {
   const schema = Joi.object({
-    title: Joi.string()
+    username: Joi.string()
       .min(3)
       .max(191)
       .required(),
-    description: Joi.string()
-      .min(3)
-      .max(250)
+    gender: Joi.string()
       .required(),
-    location: Joi.string()
+    dob: Joi.date()
       .required(),
-    date_added: Joi.date()
+    citizenship: Joi.string()
       .required(),
-    validity: Joi.date()
+    address: Joi.string()
       .required(),
-    client_id: Joi.number()
-      .required(),
-    worker_id: Joi.number(),
-  }).unknown(true);
+    user_id: Joi.number()
+      .required()
+  });
 
-  return schema.validate(job);
-};
+  return schema.validate(Worker);
+}
 
-Job.belongsTo(User, { foreignKey: "worker_id" });
-Job.belongsTo(User, { foreignKey: "client_id" });
+exports.validateWorker = validateWorker;
 
-module.exports.Job = Job;
-exports.validateJob = validateJob;
+
 

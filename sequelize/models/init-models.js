@@ -1,11 +1,11 @@
 var DataTypes = require("sequelize").DataTypes;
-var _clients = require("./clients");
-var _job_ratings = require("./job_ratings");
-var _jobs = require("./jobs");
-var _roles = require("./roles");
-var _skills = require("./skills");
-var _users = require("./users");
-var _workers = require("./workers");
+var _clients = require("./client.models");
+var _job_ratings = require("./job_rating.models");
+var _jobs = require("./job.models");
+var _roles = require("./role.models");
+var _skills = require("./skill.models");
+var _users = require("./user.models");
+var _workers = require("./worker.models");
 
 function initModels(sequelize) {
   var clients = _clients(sequelize, DataTypes);

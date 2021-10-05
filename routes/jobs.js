@@ -1,34 +1,35 @@
 const router = require('express').Router();
-const {Job, validateJob} = require('../models/jobs');
+const { validateJob } = require('../sequelize/models/job.model');
 const { verify } = require('../middleware/jwt/jwt');
-const { User } = require('../models/users');
-const { Worker } = require('../models/workers');
+const { models } = require('../sequelize');
 
 //all jobs
-router.get('/jobs', verify, async (req,res) => {
+router.get('/jobs', verify, async (req, res) => {
 
     try {
-        let jobs = await Job.findAll({ include: { model : Worker, require: true, as: 'service-providers' }})
-        res.json({ success: true, message: jobs});
-        
+        let jobs = await models.job.findAll({
+            include: [{ all: true, nested: true, attributes: { exclude: ['password'] } }]
+        });
+        res.json({ success: true, message: jobs });
+
     } catch (error) {
-        res.status(500).json({success: false, error: error});
+        res.status(500).json({ success: false, error: error });
     }
 
 });
 
 //get job
-router.get('/job/:id', async (req,res) => {
+router.get('/job/:id', verify, async (req, res) => {
 
     try {
-        let job = await Job.findOne({
-            where: { id : req.params.id},
-            include: [ { model : User, require: false, attributes : {exclude : ['password']} }]
+        let job = await models.job.findOne({
+            where: { id: req.params.id },
+            include: [{ all: true, nested: true, attributes: { exclude: ['password'] } }]
         })
-        res.json({ success: true, message: job});
-        
+        res.json({ success: true, message: job });
+
     } catch (error) {
-        res.status(500).json({sucess: false ,error : error})
+        res.status(500).json({ sucess: false, error: error })
     }
 
 })
@@ -36,15 +37,15 @@ router.get('/job/:id', async (req,res) => {
 //create job
 router.post('/job', verify, async (req, res) => {
 
-    let {error} = validateJob(req.body);
+    let { error } = validateJob(req.body);
 
-    if(error) {
-        return res.status(400).json({ success: false, error : error.details[0].message});
+    if (error) {
+        return res.status(400).json({ success: false, error: error.details[0].message });
     }
 
     try {
 
-        let job = await Job.create({
+        let job = await models.job.create({
             title: req.body.title,
             description: req.body.description,
             date_added: req.body.date_added,
@@ -56,28 +57,29 @@ router.post('/job', verify, async (req, res) => {
             location: req.body.location,
             status: req.body.status
         })
-        res.status(201).json({ 
+        res.status(201).json({
             success: true,
             message: "Job created successfully",
-            job: job}) 
+            job: job
+        })
     } catch (error) {
-        res.status(500).json({ success: false, error : error });  
+        res.status(500).json({ success: false, error: error });
     }
 
 });
 
 //update job
-router.put('/job/:id', verify, async (req,res) => {
+router.put('/job/:id', verify, async (req, res) => {
 
-    let job = await Job.findByPk(req.params.id);
+    let job = await models.job.findByPk(req.params.id);
 
-    if(!job) {
-        return res.status(400).json({ success: false, error :'Job does not exist!'});
+    if (!job) {
+        return res.status(400).json({ success: false, error: 'Job does not exist!' });
     }
 
     try {
 
-        let job = await Job.update({
+        let job = await models.job.update({
             title: req.body.title,
             description: req.body.description,
             date_added: req.body.date_added,
@@ -88,28 +90,31 @@ router.put('/job/:id', verify, async (req,res) => {
             rating: req.body.rating,
             location: req.body.location,
             status: req.body.status
-            }, { returning: true, plain: true, where : { id : req.params.id }
+        }, {
+            returning: true, plain: true, where: { id: req.params.id }
         })
-        res.json({success: true,
+        res.json({
+            success: true,
             message: "Job updated successfully",
-            job: job[1] })  
+            job: job[1]
+        })
     } catch (error) {
-        res.status(500).json({ success : false, error :error }) 
+        res.status(500).json({ success: false, error: error })
     }
 
 })
 
 //delete job
-router.delete('/job/:id', verify, async (req,res) => {
+router.delete('/job/:id', verify, async (req, res) => {
 
-    let job = await Job.findByPk(req.params.id);
+    let job = await models.job.findByPk(req.params.id);
 
-    if(!job) {
-        return res.status(400).json({ error : 'Job does not exist!'});
+    if (!job) {
+        return res.status(400).json({ error: 'Job does not exist!' });
     }
 
-    job.destroy().then(response => res.status(200).json({ success : true, message : 'Job deleted successfully'}))
-    .catch(error => res.status(500).json({ success : false, error : error}) )
+    job.destroy().then(response => res.status(200).json({ success: true, message: 'Job deleted successfully' }))
+        .catch(error => res.status(500).json({ success: false, error: error }))
 
 })
 

@@ -1,17 +1,17 @@
 const router = require('express').Router();
 const { verify } = require('../middleware/jwt/jwt');
-const { User, registrationValidation } = require('../models/users');
-const { Client } = require('../models/clients');
-const { Job } = require('../models/jobs');
+const { models } = require('../sequelize');
+const { registrationValidation } = require('../sequelize/models/user.model');
 const bcrypt = require('bcryptjs');
 
 //all clients
 router.get('/clients', verify, async (req, res) => {
 
     try {
-        let clients = await Client.findAll({
+        let clients = await models.client.findAll({
             include: [{
-                model: User,
+                model: models.user,
+                as: 'user',
                 required: true,
                 attributes: { exclude: ['password'] }
             }]
@@ -27,14 +27,14 @@ router.get('/clients', verify, async (req, res) => {
 router.get('/client/:id', async (req, res) => {
 
     try {
-        let client = await Client.findOne({
+        let client = await models.client.findOne({
             where: { user_id: req.params.id },
-            include: { model: User, attributes: { exclude: ['password'] }, include: Job },
+            include: [{ all: true, nested: true, attributes: { exclude: ['password'] } }]
         })
         res.json({ success: true, message: client });
-        
+
     } catch (error) {
-        res.status(500).json({ success: false, error :error });
+        res.status(500).json({ success: false, error: error });
     }
 
 });
@@ -53,7 +53,7 @@ router.post('/client', async (req, res) => {
 
     try {
 
-        let user = await User.create({
+        let user = await models.user.create({
             first_name: req.body.first_name,
             middle_name: req.body.middle_name,
             last_name: req.body.last_name,
@@ -66,23 +66,23 @@ router.post('/client', async (req, res) => {
 
         try {
 
-            let client = await Client.create({
+            let client = await models.client.create({
 
                 user_id: user.id,
                 username: req.body.username,
                 status: req.body.status
             });
-                    // await transaction.commit();
+            // await transaction.commit();
             res.status(201).json({
                 message: "You have successfully been registered.",
                 success: true,
                 user: client
             });
-            
+
         } catch (error) {
             res.status(500).json({ success: false, error: error });
         }
-   
+
     } catch (error) {
         res.status(500).json({ success: false, error: error.errors[0].message });
     }
@@ -92,14 +92,14 @@ router.post('/client', async (req, res) => {
 //update client
 router.put('/client/:id', verify, async (req, res) => {
 
-    let client = await User.findByPk(req.params.id);
+    let client = await models.user.findByPk(req.params.id);
 
     if (!client) {
-        return res.status(500).json({ success: false, error :'User does not exist!'});
+        return res.status(500).json({ success: false, error: 'User does not exist!' });
     }
 
     try {
-        let user = await User.update({
+        let user = await models.user.update({
 
             first_name: req.body.first_name,
             middle_name: req.body.middle_name,
@@ -108,18 +108,18 @@ router.put('/client/:id', verify, async (req, res) => {
             phone_number: req.body.phone_number,
             role_id: req.body.role_id,
             status: req.body.status,
-    
+
         }, { returning: true, plain: true, where: { id: req.params.id } })
 
         try {
 
-            let client_profile = await Client.findOne({ where : { user_id : user[1].id}});
+            let client_profile = await models.client.findOne({ where: { user_id: user[1].id } });
 
-            if(!client_profile) {
-                return res.status(400).json({ success: false, error: 'User profile does not exist!'});
+            if (!client_profile) {
+                return res.status(400).json({ success: false, error: 'User profile does not exist!' });
             }
 
-            let client = await Client.update({
+            let client = await models.client.update({
 
                 user_id: req.params.id,
                 username: req.body.username,
@@ -133,24 +133,24 @@ router.put('/client/:id', verify, async (req, res) => {
                 message: "Your profile has been updated successfully .",
                 success: true,
                 user: client[1]
-            });            
+            });
         } catch (error) {
-            res.status(500).json({ success: false, message: error }); 
+            res.status(500).json({ success: false, message: error });
         }
-        
+
     } catch (error) {
-        res.status(500).json({ success: false, error: error.errors[0].message });  
+        res.status(500).json({ success: false, error: error.errors[0].message });
     }
-     
+
 });
 
 //delete client
 router.delete('/client/:id', verify, async (req, res) => {
 
-    let client = await Client.findOne({ where: { user_id: req.params.id } });
+    let client = await models.client.findOne({ where: { user_id: req.params.id } });
 
     if (!client) {
-        return res.status(400).json({ success: false, error : "The Client does not exist!"});
+        return res.status(400).json({ success: false, error: "The Client does not exist!" });
     }
 
     client.destroy().then(response => res.status(200).json({ success: true, message: 'Client account deleted successfully' }))
@@ -162,9 +162,9 @@ router.delete('/client/:id', verify, async (req, res) => {
 router.get('/client/jobs/:id', verify, async (req, res) => {
 
     try {
-        let client = await Client.findOne({
-        where: { user_id: req.params.id },
-        include: { model: User, attributes: { exclude: ['password'] } }
+        let client = await models.client.findOne({
+            where: { user_id: req.params.id },
+            include: { model: user, attributes: { exclude: ['password'] } }
         });
         res.json({ success: true, message: client });
     } catch (error) {

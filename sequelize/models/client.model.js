@@ -1,12 +1,8 @@
-const sequelize = require("../dbconfig");
 const DataTypes = require('sequelize');
 const Joi = require("joi");
-const { User } = require('./users');
-const { Job } = require('./jobs');
 
-const Worker = sequelize.sequelize.define(
-  'workers',
-  {
+module.exports = (sequelize) => {
+  sequelize.define('client', {
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
@@ -29,13 +25,9 @@ const Worker = sequelize.sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
-    },
-    profile_photo: {
-      type: DataTypes.STRING(255),
-      allowNull: true
     },
     status: {
       type: DataTypes.BOOLEAN,
@@ -48,14 +40,6 @@ const Worker = sequelize.sequelize.define(
     },
     citizenship: {
       type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    skills: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    rate: {
-      type: DataTypes.BIGINT,
       allowNull: true
     },
     created_at: {
@@ -78,7 +62,7 @@ const Worker = sequelize.sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -86,7 +70,7 @@ const Worker = sequelize.sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -94,7 +78,7 @@ const Worker = sequelize.sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -102,29 +86,29 @@ const Worker = sequelize.sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     }
   }, {
     sequelize,
-    tableName: 'workers',
+    tableName: 'clients',
     schema: 'public',
     timestamps: false,
     underscored: true,
     indexes: [
       {
-        name: "worker_profiles_pkey",
+        name: "client_profiles_pkey",
         unique: true,
         fields: [
           { name: "id" },
         ]
       },
     ]
-  }
-);
+  })
+}
 
-function validateWorker(Worker) {
+function validateClient(client) {
   const schema = Joi.object({
       username: Joi.string()
           .min(3)
@@ -140,16 +124,12 @@ function validateWorker(Worker) {
           .required(),
       user_id: Joi.number()
           .required()
-  });
+  }).unknown(true);
 
-  return schema.validate(Worker);
+  return schema.validate(client);
 }
 
-Worker.belongsTo(User, { foreignKey : 'user_id'});
-Worker.hasMany(Job, { foreignKey: 'worker_id', as: 'jobs'});
-
-exports.Worker = Worker;
-exports.validateWorker = validateWorker;
+exports.validateClient = validateClient;
 
 
 

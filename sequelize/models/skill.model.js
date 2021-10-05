@@ -1,6 +1,7 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('skills', {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+  sequelize.define('skill', {
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,

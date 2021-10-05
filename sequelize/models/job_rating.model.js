@@ -1,6 +1,7 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('job_ratings', {
+const { DataTypes }= require('sequelize');
+
+module.exports = (sequelize) => {
+  sequelize.define('job_rating', {
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
@@ -11,7 +12,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -47,7 +48,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -55,7 +56,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -63,7 +64,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     },
@@ -71,7 +72,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
-        model: 'users',
+        model: 'user.models',
         key: 'id'
       }
     }
